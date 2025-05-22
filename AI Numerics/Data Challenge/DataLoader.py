@@ -8,7 +8,7 @@ class HeartFailureDataset:
         # Daten als Attribute speichern
         self.X = heart_failure_clinical_records.data.features
         self.y = heart_failure_clinical_records.data.targets
-
+    
     def get_features(self):
         """Gibt die Features zurück."""
         return self.X
