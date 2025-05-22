@@ -1,0 +1,27 @@
+Doku
+
+Preprocessing:
+    
+
+Feature Selection:
+    - Logisitc Regression mit L1 bzw. L2 regularisierung
+    - PCA
+    - Clustering??
+
+Klassifikation
+    - K Nearest Neighbor
+    - Bäume:
+
+    - Logistic Regression:
+        -> über Torch Layer 
+            - verschiedene Loss Funktionen
+            - Regularisierung
+    
+    - Neural Network
+
+Wichtigste Parameter:
+    - Faktoren in Regression
+    - 1 zu 1 Regression
+    - 1- alle regression
+
+
