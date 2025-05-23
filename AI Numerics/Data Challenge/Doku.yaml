@@ -1,7 +1,8 @@
 Doku
 
 Preprocessing:
-    
+    - Scaling of data is necessary, otherwise the neural network for Logistic Network does not work
+       --> without scaling the gradients are really really small --> 0, so we have no convergence
 
 Feature Selection:
     - Logisitc Regression mit L1 bzw. L2 regularisierung
