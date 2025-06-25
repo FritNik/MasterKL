@@ -26,6 +26,8 @@ Wichtigste Parameter:
     - 1- alle regression
 
 Fragen:
-    - Zeit nehmen für modelle? Gridsearch??
+    - Wie bestimme ich Laufzeit bei Modellen die mit GridSearch gefittet werden? Die Zeit kann von den Parametern abhängen und die Parameter sind über die outer Folds verschieden
+    - eSPA for Classification does not work
+    - SVM: Gradient Descent ist schneller als Implementierung mit ungefähr gleicher Genauigkeit
 
 
