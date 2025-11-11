@@ -29,8 +29,36 @@ class BasicTokenizer(Tokenizer):
         Implement the training process using get_stats and merge to build the vocabulary.
         Update self.merges and self.vocab with the new tokens.
         """
-        # Your implementation here
-        pass
+        assert vocab_size >= 256, "vocab_size must be at least 256 (byte-level)."
+
+        # Initial vocabulary: one entry per byte
+        self.vocab = {i: bytes([i]) for i in range(256)}
+        self.merges = {}
+
+        # Encode
+        ids = self.encode(text)
+
+        # Perform merges until desired vocab size
+        while len(self.vocab) < vocab_size:
+            stats = get_stats(ids)
+            
+            # Find most frequent pair
+            pair = max(stats, key=stats.get)
+
+            # Assign next index for new token
+            idx = len(self.vocab)
+            self.merges[pair] = idx
+            self.vocab[idx] = self.vocab[pair[0]] + self.vocab[pair[1]]
+
+            # Merge in the training text
+            ids = merge(ids, pair, idx)
+
+            if verbose:
+                print(f"Merged {pair} with id {idx} (vocab size: {len(self.vocab)})")
+
+        if verbose:
+            print(f"Training complete. Final vocab size: {len(self.vocab)}")
+
 
     def decode(self, ids):
         # given ids (list of integers), return Python string

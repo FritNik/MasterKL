@@ -14,7 +14,13 @@ def get_stats(ids, counts=None):
     Example: [1, 2, 3, 1, 2] -> {(1, 2): 2, (2, 3): 1, (3, 1): 1}
     Optionally allows updating an existing dictionary of counts.
     """
-    # Your implementation here
+    if counts is None:
+        counts = {}
+
+    for i in range(len(ids) - 1):
+        pair = (ids[i], ids[i+1])
+        counts[pair] = counts.get(pair, 0) + 1
+        
     return counts
 
 def merge(ids, pair, idx):
@@ -23,8 +29,27 @@ def merge(ids, pair, idx):
     of pair with the new integer token idx.
     Example: ids=[1, 2, 3, 1, 2], pair=(1, 2), idx=4 -> [4, 3, 4]
     """
-    # Your implementation here
-    return newids
+    copy_ids = ids[:] 
+    
+    modified = True
+    while modified:
+        modified = False
+        i = 0
+        new_ids = []
+
+        while i < len(copy_ids):
+            if i + 1 < len(copy_ids) and (copy_ids[i], copy_ids[i+1]) == pair:
+                # Replacement found -> Add the new token and skip the next element
+                new_ids.append(idx)
+                i += 2  # Skip the pair
+                modified = True
+            else:
+                # No match-> Add the current element and move to the next
+                new_ids.append(copy_ids[i])
+                i += 1
+        copy_ids = new_ids
+        
+    return new_ids
 
 #For testing purposes
 if __name__ == "__main__":
@@ -72,7 +97,10 @@ class Tokenizer:
         self.vocab = self._build_vocab() # int -> bytes
 
     def building_merges(self, text, vocab_size, verbose=False):
-        # Tokenizer can train a vocabulary of size vocab_size from text
+        """
+        Tokenizer trainiert ein Vokabular der Größe vocab_size aus einem Text
+        unter Verwendung des BPE-Algorithmus.
+        """
         raise NotImplementedError
 
     def encode(self, text):
