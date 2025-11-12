@@ -45,22 +45,15 @@ class RegexTokenizer(Tokenizer):
         Implement the training process using `get_stats` and `merge` to build the vocabulary.
         Update `self.merges` and `self.vocab` with the new tokens.
         """
-        assert vocab_size >= 256, "vocab_size must be at least 256 (byte-level)."
-
-        # 1. Apply regex to split text into tokens
-        tokens = re.findall(self.pattern, text)
-
-        # 2. Reconstruct text as a space-separated string (to keep token boundaries)
-        regex_text = " ".join(tokens)
-
-        # 3. Encode using BasicTokenizer encode (into byte IDs)
-        ids = self.encode(regex_text)
-
-        # 4. Initialize vocab and merges
+       #  Initialize vocab and merges
         self.vocab = {i: bytes([i]) for i in range(256)}
+        print(self.vocab)
         self.merges = {}
 
-        # 5. Perform BPE merges exactly like BasicTokenizer
+        #Encode the text using encode_ordinary (handles regex splitting)
+        ids = self.encode_ordinary(text)
+
+        # 3. Perform BPE merges until desired vocab size
         while len(self.vocab) < vocab_size:
             stats = get_stats(ids)
             if not stats:
@@ -78,12 +71,12 @@ class RegexTokenizer(Tokenizer):
             ids = merge(ids, pair, idx)
 
             if verbose:
-                print(f"Merged {pair} → id {idx} (vocab size: {len(self.vocab)})")
+                print(f"Merge {pair} → id {idx} (vocab size: {len(self.vocab)})")
 
         if verbose:
             print(f"Training complete. Final vocab size: {len(self.vocab)}")
 
-        # save class variables
+        #save class variables
         #self.merges = merges
         #self.vocab = vocab  
 
@@ -179,4 +172,5 @@ class RegexTokenizer(Tokenizer):
             else:
                 # this is an ordinary sequence, encode it normally
                 ids.extend(self.encode_ordinary(part))
+        print("test")
         return ids

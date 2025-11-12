@@ -54,7 +54,7 @@ class BasicTokenizer(Tokenizer):
             ids = merge(ids, pair, idx)
 
             if verbose:
-                print(f"Merged {pair} with id {idx} (vocab size: {len(self.vocab)})")
+                print(f"Merge {pair} with id {idx} (vocab size: {len(self.vocab)})")
 
         if verbose:
             print(f"Training complete. Final vocab size: {len(self.vocab)}")
