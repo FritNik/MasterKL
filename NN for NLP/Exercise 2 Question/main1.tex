@@ -1,0 +1,62 @@
+\documentclass{article}
+\usepackage{geometry}
+\geometry{a4paper}
+
+\title{Neural Networks for NLP - Sheet 1}
+\author{Department of Computer Science\\Rheinland-Pfälzische Technische Universität\\Kaiserslautern-Landau}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Task 1: Linear- and Nonlinear Models}
+
+Assume we are given two lists - one containing 1,000 randomly selected Spanish words and another containing 1,000 randomly selected English words. Given a new word that is either English or Spanish, we want to use these lists to predict its language. We will first vectorize all words, i.e., find a sensible mapping $\phi$ that maps any word to some vector in $\mathbb{R}^n$.
+
+\begin{enumerate}
+    \item[(a)] Describe a vectorization mapping for words for this problem.
+    \item[(b)] When given a new word, $w$, we use vectorization to obtain $\phi(w)$ and compare it to the other 2,000 vectors in order to determine its language. For this purpose, should we use a linear model (such as an SVM), or should we use a non-linear approach (such as neural networks)? Explain.
+    \item[(c)] Suppose we use a neural network to obtain such a classifier. Describe the input and output of such a network as well as its training procedure using the given two lists.
+\end{enumerate}
+\section*{Task 2: Preprocessing}
+
+In the Materials folder, you will find tutorial-1.ipynb. The task involves several steps of text preprocessing to evaluate changes in the performance of a text classification model, specifically in terms of accuracy.
+
+\begin{enumerate}
+    \item[(a)] Remove stopwords and special tokens from the text (Bag of Words model). Document how the removal of these elements impacts the accuracy of the model.
+    \item[(b)] Manually apply tf-idf to the text. Do not use any external packages for this task. Report on how the accuracy of the model changes as a result of this transformation.
+    \item[(c)] Determine and report the minimal sufficient vocabulary size. This should be based on the impact of vocabulary size on the model's accuracy. Provide a brief analysis of how reducing or increasing the vocabulary size affects performance.
+\end{enumerate}
+
+Each part of this task requires careful manipulation of text data and assessment of outcomes, contributing to a comprehensive understanding of basic text preprocessing techniques in natural language processing.
+
+\section*{Task 3: Implementing a Byte Pair Encoding (BPE) Tokenizer}
+
+In this task, you will implement key components of a Byte Pair Encoding (BPE) tokenizer, a fundamental tool in natural language processing for subword tokenization. You are provided with several Python files containing skeleton code for tokenizer classes and associated helper functions. Your task is to complete specific functions within these files to build a functioning tokenizer.
+
+\begin{enumerate}
+    \item Implement the \textbf{\texttt{get\_stats}} function in \texttt{base.py}, which computes the frequency of each pair of consecutive tokens in a list of token IDs.
+    \item Implement the \textbf{\texttt{merge}} function in \texttt{base.py}, which replaces all occurrences of a specified token pair with a new token ID in a list of token IDs.
+    \item Complete the \textbf{\texttt{train}} method in the \texttt{BasicTokenizer} class in \texttt{basic.py}, utilizing the \texttt{get\_stats} and \texttt{merge} functions to build the tokenizer's vocabulary.
+    \item Complete the \textbf{\texttt{train}} method in the \texttt{RegexTokenizer} class in \texttt{regex.py}, which extends the \texttt{BasicTokenizer} by handling regex-based text splitting and special tokens.
+\end{enumerate}
+
+\subsection*{Components of the BPE Tokenizer Implementation}
+\begin{enumerate}
+    \item \textbf{\texttt{get\_stats}} function in \texttt{base.py}: This function computes the frequency of each pair of consecutive tokens in a list of token IDs. It serves as the foundation for identifying the most common pairs of tokens to merge during the training phase of the tokenizer.
+    \item \textbf{\texttt{merge}} function in \texttt{base.py}: This function replaces all occurrences of a specified token pair with a new token ID in a list of token IDs. This operation is critical for reducing the vocabulary size and for increasing the efficiency of the tokenizer.
+    \item \textbf{\texttt{train}} method in the \texttt{BasicTokenizer} class in \texttt{basic.py}: Utilizes the \texttt{get\_stats} and \texttt{merge} functions to iteratively build the tokenizer's vocabulary. The method involves learning from a training corpus to determine the most frequent token pairs and applying the merge operations accordingly.
+    \item \textbf{\texttt{train}} method in the \texttt{RegexTokenizer} class in \texttt{regex.py}: This method extends the \texttt{BasicTokenizer} by incorporating regex-based text splitting. It handles not just the simple merging of token pairs but also special tokens that may include punctuation marks, special characters, or other non-alphabetic elements. This method is crucial for ensuring the tokenizer can adequately process real-world text data that might contain a variety of characters and symbols.
+\end{enumerate}
+
+
+
+\subsection*{Testing and Validation}
+Ensure the tokenizer's performance by testing it with:
+\begin{itemize}
+    \item Diverse text inputs to check its ability to generalize across different text types and languages.
+    \item Validation datasets to assess the accuracy and efficiency of the tokenization process, comparing it with baseline tokenizers to highlight improvements.
+\end{itemize}
+
+
+\end{document}
