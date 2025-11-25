@@ -121,9 +121,8 @@ def generate_mappings(tokens):
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-
-        
+import torch.optim as optim
+import torch.autograd as autograd
 
 class CBOW(nn.Module):
     """
@@ -133,23 +132,20 @@ class CBOW(nn.Module):
     It predicts a target word based on context words within a fixed window size. The model uses embeddings 
     to represent words and employs linear layers for prediction.
     """
-  
     def __init__(self, vocab_size, context_size, embedding_dim):
         super(CBOW, self).__init__()
 
         self.embeddings = nn.Embedding(vocab_size, embedding_dim)
-        self.linear1 = nn.Linear(context_size * embedding_dim, 128) #we get several context words to predict one word, so dimesnion of contextWindow times embedding_dim
+        self.linear1 = nn.Linear(context_size * embedding_dim, 128)
         self.linear2 = nn.Linear(128, vocab_size)
+        self.context_size = context_size
 
     def forward(self, inputs):
-        output = None
-        embeds = self.embeddings(inputs)            
-        embeds = embeds.view(1, -1)    
-        output = F.relu(self.linear1(embeds))
+        embeds = self.embeddings(inputs)
+        flattened_embeds = embeds.view(1, -1)
+        output = F.relu(self.linear1(flattened_embeds))
         output = self.linear2(output)
-        
         return F.log_softmax(output, dim=-1)
-
 
 class SkipGram(nn.Module):
     """
@@ -160,50 +156,50 @@ class SkipGram(nn.Module):
     the surrounding context. The model consists of embedding and linear layers, and it utilizes ReLU 
     activation and log softmax for its output.
     """
-
     def __init__(self, vocab_size, context_size, embedding_dim):
         super(SkipGram, self).__init__()
 
         self.embeddings = nn.Embedding(vocab_size, embedding_dim)
-        self.linear1 = nn.Linear(embedding_dim, 128) #we want to say how likely a word out of vocab is to appear next to given center word, so one word is input
+        self.linear1 = nn.Linear(embedding_dim, 128)
         self.linear2 = nn.Linear(128, context_size * vocab_size)
         
         self.context_size = context_size
+        self.vocab_size = vocab_size
 
     def forward(self, inputs):
-        output = None
         embeds = self.embeddings(inputs)
         output = F.relu(self.linear1(embeds))
         output = self.linear2(output)
-
+        
+        output = output.view(-1, self.vocab_size)
         return F.log_softmax(output, dim=-1)
-
 
 def train_word2vec(model, inputs, targets, num_epochs):
     optimizer = optim.SGD(model.parameters(), lr=0.01)
     loss_function = nn.NLLLoss()
-
+    
     losses = []
     
     for epoch in range(num_epochs):
         total_loss = 0
         for input, target in zip(inputs, targets):
             model.zero_grad()
-
+            
             input_tensor = input
-            target_tensor = target
-
-
+            target_tensor = target.flatten() # Macht die Funktion universell für CBOW (1 Target) und Skip-Gram (C Targets)
+            
             output = model.forward(input_tensor)
             loss = loss_function(output, target_tensor)
 
             loss.backward()
             optimizer.step()
-
+            
             total_loss += loss.item()
-        
+            
         losses.append(total_loss)
     return losses
+
+
 
 
 def plot_loss(title, axis):
