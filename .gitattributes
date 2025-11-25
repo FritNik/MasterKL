@@ -1,0 +1,1 @@
+NN[[:space:]]for[[:space:]]NLP/Exercise[[:space:]]2[[:space:]]Question/Tutorial[[:space:]]2/glove.6B.50d.txt filter=lfs diff=lfs merge=lfs -text
