@@ -77,7 +77,16 @@ def tokenize(raw_text):
     >>> tokenize(text)
     ['i', 'ca', 'not', 'believe', 'it', 's', 'not', 'butter']
     """
-    raise NotImplementedError()  # TODO: Complete the function
+    # Replace "n't" with " not"
+    text = re.sub(r"n't\b", " not", raw_text)
+
+    # Convert to lowercase
+    text = text.lower()
+
+    # Extract alphanumeric word tokens
+    tokens = re.findall(r"[a-z0-9]+", text) #characters a-z and digits 0-9 are allowed
+
+    return tokens
 
 
 def load_training_data(fname):
@@ -105,7 +114,20 @@ def load_training_data(fname):
     >>> print(words[0]) # Prints the tokens of the first line in the file
     >>> print(targets[0]) # Prints the sentiment label of the first line
     """
-    raise NotImplementedError()  # TODO: Complete the function
+    words = []
+    targets = []
+
+    with open(fname, "r", encoding="utf-8") as f:
+        for idx, line in enumerate(f):
+            tokens = tokenize(line.strip()) #delete leading white spaces and Zeilenumbruch
+            words.append(tokens)
+
+            # odd line number -> positive sentiment (1)
+            # even line number -> negative sentiment (0)
+            label = 1 if idx % 2 == 1 else 0
+            targets.append(label)
+
+    return words, torch.tensor(targets, dtype=torch.long)
 
 
 def encode_and_pad(words, word2id, max_size):
@@ -174,14 +196,35 @@ def train(inputs, targets, num_epochs, embeddings):
     loss_function = nn.BCELoss()
     losses = []
     
-    # TODO: complete the code
+    for epoch in range(num_epochs):
+        total_loss = 0.0
+
+        for x, y in zip(inputs, targets):
+            # x ist eine Liste aus Token-IDs → wir brauchen einen Tensor
+            x_tensor = torch.tensor(x, dtype=torch.long)
+            # Forward pass
+            output = clf(x_tensor)
+
+            # y auf float setzen für BCELoss, sonst bekomme ich Fehler
+            y_tensor = torch.tensor(float(y), dtype=torch.float)
+
+            loss = loss_function(output, y_tensor)
+
+            # Backprop
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            total_loss += loss.item()
+        print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {total_loss:.4f}")
+        losses.append(total_loss)
     
-    return losses
+    return losses, clf
 
 
 class SentimentClassifier(nn.Module):
     """
-    A sentiment classifier based on a Long Short-Term Memory (LSTM) network.
+    A sentiment classifier based on a Long Short-Term Memory (LSTM) network. WIll classify ppostive ir begative sentiment.
     """
 
     def __init__(self, input_size, embedding_dim, hidden_dim=256, LSTM_layers_size=2):
@@ -189,7 +232,7 @@ class SentimentClassifier(nn.Module):
 
         self.hidden_dim = hidden_dim
 
-        self.embedding = nn.Embedding(input_size, embedding_dim)
+        self.embedding = nn.Embedding(input_size, embedding_dim) #werden hier mittrtainiert
         self.lstm = nn.LSTM(
             input_size=embedding_dim, hidden_size=hidden_dim, num_layers=LSTM_layers_size, batch_first=True
         )
@@ -197,8 +240,23 @@ class SentimentClassifier(nn.Module):
         self.sig = nn.Sigmoid()
 
     def forward(self, input):
-        output = None
-        
-        # TODO: Complete the function
+        # input ist ein 1D-Tensor mit Wort-IDs, z.B. [3, 10, 5, ...]
 
-        return output
+        # 1) Wort-IDs in Embeddings durch lernbar EMbeddinglayer (Form: [seq_len, embedding_dim])
+        embedded = self.embedding(input)
+
+        # 2) Batch-Dimension hinzufügen (LSTM erwartet [batch, seq_len, emb_dim])
+        embedded = embedded.unsqueeze(0) 
+
+        # 3) LSTM anwenden, letzer hidden_state repräsentiert den ganzen Satz
+        _, (hidden_states, _) = self.lstm(embedded)
+
+        # 4) Letzte LSTM-Schicht extrahieren (Form: [1, hidden_dim]), letzter hidden state beste repräsentiert den ganzen Satz
+        last_hidden = hidden_states[-1]
+
+        # 5) Sigmoid um WSL zu kriegen
+        output = self.sig(self.fc(last_hidden))
+
+        # 6) Form reduzieren → einzelner Wert
+        return output.squeeze()
+
