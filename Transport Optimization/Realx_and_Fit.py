@@ -86,6 +86,12 @@ already_covered = {
     if any(a.get((i, j), 0) == 1 for j in existing_ids)
 }
 
+
+#NOTE: To adapt the problem to be able to close existing locations remove the comments below
+#already_covered = {}
+#stations_to_open_ids = stations_to_open_ids + existing_ids
+
+
 # Nur die noch ungedeckten müssen noch abgedeckt werden
 uncovered_demand_points = [i for i in demand_ids if i not in already_covered]
 

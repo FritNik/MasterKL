@@ -73,6 +73,8 @@ demand_points  = parse_giv(DEMAND_FILE)
 existing_ids   = {s["id"] for s in existing_stops}
 stations_to_open_ids  = {c["id"] for c in stations_to_open}
 station_info  = {loc["id"]: loc for loc in existing_stops + stations_to_open}
+#NOTE: possibility to modify the problem to be able to close existing stops
+#stations_to_open_ids = stations_to_open_ids.union(existing_ids)  # alle möglichen stationen, aber nur die neuen werden in der Zielfunktion gezählt
 
 #load covering matrix as lists and a as a dict
 demand_ids, stations_ids, a = parse_covering_matrix(COVERING_MATRIX)
@@ -84,7 +86,7 @@ print(f"Radius        : {RADIUS}")
 
 # create Gurobi model
 model = gp.Model("DSL")
-model.Params.OutputFlag = 1
+model.Params.OutputFlag = 0
 
 x = model.addVars(stations_ids, vtype=GRB.BINARY, name="x")
 
